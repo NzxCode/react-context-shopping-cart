@@ -14,7 +14,7 @@ function Navbar() {
                 Tentang Toko Ini!
             </Link>
             <Link to="/cart" className="text-lg font-semibold decoration-none text-white">
-                Keranjang : {cart}
+                Keranjang : {cart.length}
             </Link>
         </nav>
     )

@@ -3,9 +3,9 @@ import { CartContext } from "../context/CartContext";
 import { Link } from "react-router-dom";
 
 const products = [
-    { id: 1, name: "Laptop Gaming", price: "Rp 17.500.000"},
-    { id: 2, name: "PS5", price: "Rp 9.500.000"},
-    { id: 3, name: "Mouse Wireless", price: "Rp 500.000"},
+    { id: 1, name: "Laptop Gaming", price: 17500000},
+    { id: 2, name: "PS5", price: 9500000},
+    { id: 3, name: "Mouse Wireless", price: 500000},
 ];
 
 export default function ProductList() {
@@ -19,9 +19,9 @@ export default function ProductList() {
                             {product.name}
                         </h3>
                     </Link>
-                <p className="text-gray-600 mb-4">{product.price}</p>
-                <button onClick={addToCart} className="bg-green-500 text-white w-full py-2 rounded hover:bg-green-600 transition">
-                    Buy Now!
+                <p className="text-gray-600 mb-4">Rp {product.price.toLocaleString("id-ID")}</p>
+                <button onClick={() => addToCart(product)} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    Masukkan Keranjang
                 </button>
             </div>
             ))} 
