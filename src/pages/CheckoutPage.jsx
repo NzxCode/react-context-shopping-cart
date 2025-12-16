@@ -1,10 +1,24 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { CartContext } from "../context/CartContext";
 
 export default function CheckoutPage() {
     const { cart } = useContext(CartContext);
 
     const totalPrice = cart.reduce((total, item) => total + item.price, 0);
+
+    const [formData, setformData] = useState({
+        name: "",
+        whatsapp: "",
+        address: "",
+    });
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setformData({
+            ...formData,
+            [name]: value
+        });
+    };
 
     return (
         <div className="p-8 container mx-auto">
@@ -18,17 +32,37 @@ export default function CheckoutPage() {
                         
                         <div>
                             <label className="block text-gray-700 font-medium mb-1">Nama Lengkap</label>
-                            <input type="text" className="w-full border p-2 rounded" placeholder="Contoh: Nicolas" />
+                            <input 
+                                type="text" 
+                                name="name"
+                                value={formData.name}
+                                onChange={handleChange}
+                                className="w-full border p-2 rounded"
+                                placeholder="Contoh: Nicolas"
+                            />
                         </div>
                         
                         <div>
                             <label className="block text-gray-700 font-medium mb-1">Nomor WhatsApp</label>
-                            <input type="number" className="w-full border p-2 rounded" placeholder="08xxxxxxxx" />
+                            <input 
+                            type="number"
+                            name="whatsapp"
+                            value={formData.whatsapp}
+                            onChange={handleChange} 
+                            className="w-full border p-2 rounded" 
+                            placeholder="08xxxxxxxx" />
                         </div>
 
                         <div>
                             <label className="block text-gray-700 font-medium mb-1">Alamat Pengiriman</label>
-                            <textarea className="w-full border p-2 rounded" rows="3" placeholder="Jalan, RT/RW..."></textarea>
+                            <textarea 
+                            name="address"
+                            value={formData.address}
+                            onChange={handleChange}
+                            className="w-full border p-2 rounded" 
+                            rows="3" 
+                            placeholder="Jalan, RT/RW...">
+                            </textarea>
                         </div>
                     </form>
                 </div>
