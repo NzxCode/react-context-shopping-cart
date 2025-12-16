@@ -1,8 +1,11 @@
 import { useContext, useState } from "react";
 import { CartContext } from "../context/CartContext";
+import { useNavigate } from "react-router-dom";
 
 export default function CheckoutPage() {
-    const { cart } = useContext(CartContext);
+    const { cart, cleanCart } = useContext(CartContext);
+
+    const navigate = useNavigate();
 
     const totalPrice = cart.reduce((total, item) => total + item.price, 0);
 
@@ -19,6 +22,20 @@ export default function CheckoutPage() {
             [name]: value
         });
     };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+    if (!formData.name || !formData.whatsapp || !formData.address) {
+        alert("DATA ANDA BELUM LENGKAP! Silahkan isi datanya terlebih dahulu agar pemrosesan dapat dilanjutkan.");
+        return;
+    }
+
+    alert(`Pesanan dapat diterima atas nama ${formData.name}! kami dapat menghubungi lewat nomor whatsapp ${formData.whatsapp}.`);
+    cleanCart();
+    navigate("/");
+
+};
 
     return (
         <div className="p-8 container mx-auto">
@@ -84,7 +101,9 @@ export default function CheckoutPage() {
                         <span className="text-blue-600">Rp {totalPrice.toLocaleString("id-ID")}</span>
                     </div>
 
-                    <button className="w-full mt-6 bg-green-600 text-white py-3 rounded font-bold hover:bg-green-700 transition">
+                    <button
+                        onClick={handleSubmit} 
+                        className="w-full mt-6 bg-green-600 text-white py-3 rounded font-bold hover:bg-green-700 transition">
                         BAYAR SEKARANG
                     </button>
                 </div>
