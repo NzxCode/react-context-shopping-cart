@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { CartContext } from "../context/CartContext"; 
-import { products } from "../data/products"; 
+import { products } from "../data/product"; 
 import { Link } from "react-router-dom"; 
 
 export default function HomePage() {
