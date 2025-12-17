@@ -1,8 +1,10 @@
 import { useParams } from "react-router-dom";
 import { products } from "../data/product";
+import { useContext } from "react";
+import { CartContext } from "../context/CartContext";
 export default function DetailPage() {
     const { id } = useParams();
-
+    const { addToCart } = useContext(CartContext);
     const product = products.find((p) => p.id === parseInt(id));
 
     if (!product) {
@@ -17,6 +19,9 @@ export default function DetailPage() {
                 Rp {product.price.toLocaleString("id-ID")}
             </p>
             <p className="text-gray-700">{product.description}</p>
+            <button onClick={() => addToCart(product)} className="mt-6 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 font-bold">
+                + Keranjang
+            </button>
         </div>
     );
 }
