@@ -1,10 +1,31 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { CartContext } from "../context/CartContext"; 
-import { products } from "../data/product"; 
 import { Link } from "react-router-dom"; 
+import { db } from "../firebase"; 
+import { collection, getDocs } from "firebase/firestore";
 
 export default function HomePage() {
     const { addToCart } = useContext(CartContext);
+
+    const [products, setProducts] = useState([]);
+
+    useEffect(() => {
+        const ambilDataDariAwan = async () => {
+            try {
+                const productsCollection = collection(db, "products");
+                const snapshot = await getDocs(productsCollection);
+                const dataBersih = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                setProducts(dataBersih);
+                console.log("Data berhasil diambil:", dataBersih);
+            } catch (error) {
+                console.error("Gagal ambil data:", error);
+            }
+        };
+        ambilDataDariAwan();
+    }, []);
 
     return (
         <div className="p-8 container mx-auto">
