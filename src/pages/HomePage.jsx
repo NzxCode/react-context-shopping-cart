@@ -15,8 +15,8 @@ export default function HomePage() {
                 const productsCollection = collection(db, "products");
                 const snapshot = await getDocs(productsCollection);
                 const dataBersih = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
+                    ...doc.data(),
+                    id: doc.id
                 }));
                 setProducts(dataBersih);
                 console.log("Data berhasil diambil:", dataBersih);
