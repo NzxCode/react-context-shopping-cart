@@ -1,11 +1,37 @@
 import { useParams } from "react-router-dom";
-import { products } from "../data/product";
-import { useContext } from "react";
+import { db } from "../firebase";
+import { doc, getDoc } from "firebase/firestore";
+import { useContext, useEffect, useState } from "react";
 import { CartContext } from "../context/CartContext";
 export default function DetailPage() {
     const { id } = useParams();
     const { addToCart } = useContext(CartContext);
-    const product = products.find((p) => p.id === parseInt(id));
+    const [product, setProduct] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+useEffect(() => {
+        const ambilSatuProduk = async () => {
+            try {
+                const docRef = doc(db, "products", id);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    setProduct({ id: docSnap.id, ...docSnap.data() });
+                } else {
+                    console.log("Produk tidak ditemukan di database!");
+                }
+            } catch (error) {
+                console.error("Gagal ambil detail:", error);
+            } finally {
+                setLoading(false); 
+            }
+        };
+
+        ambilSatuProduk();
+    }, [id]);
+
+    if (loading) {
+        return <div className="text-center mt-20 text-xl font-bold">Sedang memuat data... ⏳</div>;
+    }
 
     if (!product) {
         return <div>Produk tidak ditemukan!</div>
