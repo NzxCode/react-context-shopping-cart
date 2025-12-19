@@ -14,7 +14,6 @@ export const CartProvider = ({ children }) => {
 
     const addToCart = (product) => {
         setCart([...cart, product]);
-        console.log("Product didalam cart-nya :", product);
     }
 
     const cleanCart = () => {

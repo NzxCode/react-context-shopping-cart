@@ -17,7 +17,6 @@ useEffect(() => {
                 if (docSnap.exists()) {
                     setProduct({ id: docSnap.id, ...docSnap.data() });
                 } else {
-                    console.log("Produk tidak ditemukan di database!");
                 }
             } catch (error) {
                 console.error("Gagal ambil detail:", error);

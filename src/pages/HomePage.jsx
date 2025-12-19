@@ -19,7 +19,6 @@ export default function HomePage() {
                     id: doc.id
                 }));
                 setProducts(dataBersih);
-                console.log("Data berhasil diambil:", dataBersih);
             } catch (error) {
                 console.error("Gagal ambil data:", error);
             }
