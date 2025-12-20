@@ -1,6 +1,6 @@
 import { useState} from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function RegisterPage() {
     const [email, setEmail] = useState("");
@@ -41,7 +41,7 @@ export default function RegisterPage() {
                         placeholder="Isi Password"
                         className="border p-2 rounded"
                         value={password}
-                        onChange={(e) => setEmail(e.email.value)}
+                        onChange={(e) => setPassword(e.target.value)}
                         required
                     />
                     <button

@@ -41,7 +41,7 @@ export default function LoginPage() {
                         placeholder="Isi Password"
                         className="border p-2 rounded"
                         value={password}
-                        onChange={(e) => setEmail(e.email.value)}
+                        onChange={(e) => setPassword(e.target.value)}
                         required
                     />
                     <button
