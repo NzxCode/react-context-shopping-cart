@@ -7,6 +7,7 @@ import { Routes, Route } from "react-router-dom";
 import DetailPage from "./pages/DetailPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -20,9 +21,24 @@ function App() {
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route
+          path="/cart"
+          element= {
+            <ProtectedRoute>
+              <CartPage />
+            </ProtectedRoute>
+          }
+        />
+          <Route 
+             path="/checkout"
+             element= {
+                <ProtectedRoute>
+                  <CheckoutPage />
+                </ProtectedRoute>
+             }
+        />
       </Routes>
     </div>
-  )
+  );
 }
-
 export default App
