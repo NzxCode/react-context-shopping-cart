@@ -52,7 +52,7 @@ export default function CheckoutPage() {
 
             alert(`Terima kasih ${formData.name}! Pesanan berhasil dibuat.`);
             cleanCart();
-            navigate("/");
+            navigate("/success");
 
         } catch (error) {
             console.error("Error adding document: ", error);

@@ -8,6 +8,7 @@ import DetailPage from "./pages/DetailPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import SuccessPage from "./pages/SuccessPage";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/product/:id" element={<DetailPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/success" element={<SuccessPage />} />
         <Route
           path="/cart"
           element= {
