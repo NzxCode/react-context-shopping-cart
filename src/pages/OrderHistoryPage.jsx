@@ -5,8 +5,20 @@ import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
 
 function OrderHistoryPage() {
     const { currentUser } = useAuth();
-    const [ orders, setOrders ] = useState([]);
-    const [ loading, setLoading ] = useState(true);
+    const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const formatDate = (timestamp) => {
+        if (!timestamp) return "Tanggal tidak tersedia";
+        const date = new Date(timestamp.seconds * 1000);
+        return date.toLocaleDateString("id-ID", {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
 
     useEffect(() => {
         if (!currentUser) return;
@@ -15,32 +27,92 @@ function OrderHistoryPage() {
             try {
                 const ordersRef = collection(db, "orders");
                 const q = query(
-                    ordersRef, 
-                    where("userId", "==", currentUser.uid), 
+                    ordersRef,
+                    where("userId", "==", currentUser.uid),
                     orderBy("createdAt", "desc")
                 );
+
                 const querySnapshot = await getDocs(q);
                 const dataRapih = querySnapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
                 }));
+
                 setOrders(dataRapih);
-                console.log("Data Pesanan: ", dataRapih);
             } catch (error) {
-                console.error("Gagal mengambil riwayat pesanan:", error);
+                console.error(error);
             } finally {
                 setLoading(false);
             }
         }
+
         fetchOrders();
     }, [currentUser]);
-    if (loading) return <div className="p-10 text-center">Sedang mengambil data...</div>
+
+    if (loading) return <div className="p-10 text-center">Sedang mengambil data...</div>;
+
     return (
-        <div className="container mx-auto p-8">
-            <h1 className="text-3xl font-bold mb-8 text-center">Riwayat Pesanan Saya</h1>
-            <pre className="bg-gray-100 p-4 rounded overflow-auto">
-                {JSON.stringify(orders, null, 2)}
-            </pre>
+        <div className="container mx-auto p-4 md:p-8 min-h-screen">
+            <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">Riwayat Pesanan Saya</h1>
+
+            {orders.length === 0 ? (
+                <div className="text-center bg-white p-10 rounded-lg shadow border">
+                    <p className="text-gray-500 text-lg mb-4">Belum ada riwayat belanja.</p>
+                    <a href="/" className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition">
+                        Yuk Belanja Dulu
+                    </a>
+                </div>
+            ) : (
+                <div className="space-y-6">
+                    {orders.map((order) => (
+                        <div key={order.id} className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition">
+                            
+                            <div className="bg-gray-100 px-6 py-4 border-b flex justify-between items-center">
+                                <div>
+                                    <p className="text-sm font-bold text-gray-700">
+                                        {formatDate(order.createdAt)}
+                                    </p>
+                                    <p className="text-xs text-gray-500">ID: {order.id}</p>
+                                </div>
+                                <div>
+                                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                                        order.status === "Selesai" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
+                                    }`}>
+                                        {order.status || "Pending"}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="p-6">
+                                <h3 className="font-semibold text-gray-700 mb-3 text-sm">Barang yang dibeli:</h3>
+                                <div className="space-y-2 mb-4">
+                                    {order.items?.map((item, index) => (
+                                        <div key={index} className="flex justify-between text-sm text-gray-600 border-b border-dashed pb-2 last:border-0">
+                                            <span>{item.name} <span className="text-gray-400 text-xs">x1</span></span>
+                                            <span>Rp {item.price.toLocaleString("id-ID")}</span>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="flex justify-between items-center pt-4 border-t mt-4">
+                                    <div className="text-sm text-gray-600">
+                                        <p>Dikirim ke:</p>
+                                        <p className="font-medium text-gray-900">
+                                            {order.shippingDetails?.address || order.customerInfo?.address || "-"}
+                                        </p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-xs text-gray-500">Total Belanja</p>
+                                        <p className="text-xl font-bold text-blue-600">
+                                            Rp {order.totalAmount ? order.totalAmount.toLocaleString("id-ID") : order.totalPrice?.toLocaleString("id-ID")}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }
