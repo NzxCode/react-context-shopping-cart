@@ -44,3 +44,5 @@ function OrderHistoryPage() {
         </div>
     );
 }
+
+export default OrderHistoryPage;
