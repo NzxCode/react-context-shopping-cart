@@ -40,6 +40,9 @@ async function handleLogout() {
                 <Link to="/cart" className='relative hover:text-purple-300'>
                     Keranjang : {cart.length}
                 </Link>
+                <Link to="/history" className="hover:text-gray-200 font-semibold">
+                    Riwayat Pesanan
+                </Link>
              </div>
         </nav>
     );
