@@ -9,6 +9,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import SuccessPage from "./pages/SuccessPage";
+import OrderHistoryPage from "./pages/OrderHistoryPage";
 
 function App() {
   return (
@@ -21,6 +22,11 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/success" element={<SuccessPage />} />
+        <Route path="/history" element={
+          <ProtectedRoute>
+            <OrderHistoryPage />
+          </ProtectedRoute>
+        } />
         <Route
           path="/cart"
           element= {
