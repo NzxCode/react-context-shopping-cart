@@ -90,3 +90,5 @@ function AddProductPage() {
         </div>
     );
 }
+
+export default AddProductPage;

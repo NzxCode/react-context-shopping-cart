@@ -1,7 +1,7 @@
-import { db } from "../firebase/config";
+import { db } from "../firebase.js";
 import { useEffect, useState } from "react";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
-import { link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function AdminDashboardPage() {
     const [products, setProducts] = useState([]);
@@ -87,3 +87,5 @@ function AdminDashboardPage() {
         </div>
     );
 }
+
+export default AdminDashboardPage;
