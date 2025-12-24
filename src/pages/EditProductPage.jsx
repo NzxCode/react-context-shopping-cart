@@ -113,3 +113,5 @@ function EditProductPage() {
         </div>
     );
 }
+
+export default EditProductPage;
