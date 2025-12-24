@@ -10,6 +10,8 @@ import RegisterPage from "./pages/RegisterPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import SuccessPage from "./pages/SuccessPage";
 import OrderHistoryPage from "./pages/OrderHistoryPage";
+import AdminRoute from "./components/AdminRoute";
+import AdminDashboardPage from "./pages/AdminDashboardPage";
 
 function App() {
   return (
@@ -43,6 +45,14 @@ function App() {
                 </ProtectedRoute>
              }
         />
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminDashboardPage />
+              </AdminRoute>
+            }
+          />
       </Routes>
     </div>
   );
