@@ -12,6 +12,7 @@ import SuccessPage from "./pages/SuccessPage";
 import OrderHistoryPage from "./pages/OrderHistoryPage";
 import AdminRoute from "./components/AdminRoute";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
+import AddProductPage from "./pages/AddProductPage";
 
 function App() {
   return (
@@ -53,6 +54,16 @@ function App() {
               </AdminRoute>
             }
           />
+          <Route path="/admin" element={
+            <AdminRoute>
+              <AdminDashboardPage />
+            </AdminRoute>
+          } />
+          <Route path="/admin/add-product" element={
+            <AdminRoute>
+              <AddProductPage />
+            </AdminRoute>
+          } />
       </Routes>
     </div>
   );
