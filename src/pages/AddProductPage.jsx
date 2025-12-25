@@ -9,7 +9,7 @@ function AddProductPage() {
     const [price, setPrice] = useState("");
     const [description, setDescription] = useState("");
     const [imageFile, setImageFile] = useState(null);
-    const [preview, setPreview] = usestate(null); 
+    const [preview, setPreview] = useState(null); 
     const [loading, setLoading] = useState(false);
 
     const handleImageChange = (e) => {
@@ -38,13 +38,13 @@ function AddProductPage() {
                 <div>
                     <label className="block text-sm font-bold mb-1">Foto Produk</label>
                     <input 
-                        type="text" 
+                        type="file" 
                         accept="image/*"
                         onChange={handleImageChange}
                         className="w-full border p-2 rounded bg-gray-50"
                     />
                 </div>
-
+                {preview && (
                 <div className="mt-4 text-center">
                     <p className="text-xs text-gray-500 mb-2">Preview Tampilan:</p>
                         <img 
@@ -53,7 +53,7 @@ function AddProductPage() {
                             className="w-full h-64 object-cover rounded border-2 border-dashed border-gray-300"
                         />
                 </div>
-
+                )}
                 <div>
                     <label className="block text-sm font-bold mb-1">Nama Produk</label>
                     <input 
