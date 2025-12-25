@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { db } from "../firebase.js";
+import { db, storage } from "../firebase.js";
 import { collection, addDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
 
 function AddProductPage() {
@@ -27,8 +28,27 @@ function AddProductPage() {
             return;
         }
         setLoading(true);
-        alert("Sabar ya, fitur upload ke Cloud baru dipasang di Jam 3!");
-        setLoading(false);
+        
+        try {
+            const storageRef = ref(storage, `images/${Date.now()}_${imageFile.name}`);
+            const snapshot = await uploadBytes(storageRef, imageFile);
+            console.log("Upload foto sukses!");
+            const downloadURL = await getDownloadURL(snapshot.ref);
+            console.log("Link Foto:", downloadURL);
+            await addDoc(collection(db, "products"), {
+                name: name,
+                price: Number(price),
+                image: downloadURL,
+                description: description
+            });
+            alert("Produk berhasil ditambahkan!");
+            navigate("/admin");
+        } catch (error) {
+            console.error("Gagal Upload:", error);
+            alert("Waduh error saat upload: " + error.message);
+        } finally {
+            setLoading(false);
+        }
     };
     return (
         <div className="container mx-auto p-8 max-w-lg">
