@@ -1,48 +1,56 @@
-import { db } from "../firebase.js";
 import { useEffect, useState } from "react";
-import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { Link } from "react-router-dom";
 
 function AdminDashboardPage() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    // Ambil Data saat halaman dibuka
     useEffect(() => {
-        async function fetchProducts() {
-            try {
-                const querySnapshot = await getDocs(collection(db, "products"));
-                const dataGudang = querySnapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-                setProducts(dataGudang);
-            } catch (error) {
-                console.error("Gagal mengambil data produk:", error);
-            } finally {
-                setLoading(false);
-            }
-        }
         fetchProducts();
     }, []);
-    const handleDelete = async (id) => {
-        if(!window.confirm("Yakin ingin menghapus produk ini?")) return;
+
+    const fetchProducts = () => {
         try {
-            await deleteDoc(doc(db, "products", id));
-            setProducts(products.filter(product => product.id !== id));
+            // AMBIL DARI LOCAL STORAGE
+            const storedProducts = localStorage.getItem("products");
+            if (storedProducts) {
+                setProducts(JSON.parse(storedProducts));
+            } else {
+                setProducts([]);
+            }
+        } catch (error) {
+            console.error("Gagal mengambil data produk:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDelete = (id) => {
+        if(!window.confirm("Yakin ingin menghapus produk ini dari memori?")) return;
+        
+        try {
+            // Filter produk yang ID-nya TIDAK sama dengan yang dihapus
+            const updatedProducts = products.filter(product => product.id !== id);
+            
+            // Simpan array baru ke LocalStorage
+            localStorage.setItem("products", JSON.stringify(updatedProducts));
+            
+            // Update tampilan
+            setProducts(updatedProducts);
             alert("Produk berhasil dihapus!");
         } catch (error) {
             console.error("Gagal menghapus produk:", error);
-            alert("Gagal menghapus produk. Coba lagi.");
+            alert("Gagal menghapus produk.");
         }
     }
 
-    if (loading) return <div className="p-10 text-center">Sedang mengecek gudang...</div>;
-
-    console.log("Daftar Produk:", products);
+    if (loading) return <div className="p-10 text-center">Sedang mengecek gudang lokal...</div>;
 
     return (
         <div className="container mx-auto p-8">
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold text-gray-800">Gudang Produk (Admin)</h1>
+                <h1 className="text-3xl font-bold text-gray-800">Gudang Produk (Offline Mode)</h1>
                 <Link to="/admin/add-product" className="bg-green-600 text-white px-4 py-2 rounded font-bold hover:bg-green-700 transition">
                     + Tambah Produk Baru
                 </Link>

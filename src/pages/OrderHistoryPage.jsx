@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react";
-import { db } from "../firebase";
-import { useAuth } from "../context/AuthContext";
-import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
+// import { useAuth } from "../context/AuthContext"; // Hapus auth context
 
 function OrderHistoryPage() {
-    const { currentUser } = useAuth();
+    // Fake user karena offline
+    const currentUser = { uid: "guest_user" }; 
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const formatDate = (timestamp) => {
-        if (!timestamp) return "Tanggal tidak tersedia";
-        const date = new Date(timestamp.seconds * 1000);
+    const formatDate = (dateString) => {
+        if (!dateString) return "Tanggal tidak tersedia";
+        const date = new Date(dateString);
         return date.toLocaleDateString("id-ID", {
             day: 'numeric',
             month: 'long',
@@ -21,24 +20,15 @@ function OrderHistoryPage() {
     };
 
     useEffect(() => {
-        if (!currentUser) return;
-
-        async function fetchOrders() {
+        const fetchOrders = () => {
             try {
-                const ordersRef = collection(db, "orders");
-                const q = query(
-                    ordersRef,
-                    where("userId", "==", currentUser.uid),
-                    orderBy("createdAt", "desc")
-                );
+                // AMBIL DATA ORDER DARI LOCAL STORAGE
+                const storedOrders = JSON.parse(localStorage.getItem("orders")) || [];
+                
+                // Urutkan dari yang terbaru (kalau ada field createdAt)
+                const sortedOrders = storedOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-                const querySnapshot = await getDocs(q);
-                const dataRapih = querySnapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-
-                setOrders(dataRapih);
+                setOrders(sortedOrders);
             } catch (error) {
                 console.error(error);
             } finally {
@@ -47,17 +37,17 @@ function OrderHistoryPage() {
         }
 
         fetchOrders();
-    }, [currentUser]);
+    }, []);
 
-    if (loading) return <div className="p-10 text-center">Sedang mengambil data...</div>;
+    if (loading) return <div className="p-10 text-center">Sedang mengambil data riwayat...</div>;
 
     return (
         <div className="container mx-auto p-4 md:p-8 min-h-screen">
-            <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">Riwayat Pesanan Saya</h1>
+            <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">Riwayat Pesanan Saya (Offline)</h1>
 
             {orders.length === 0 ? (
                 <div className="text-center bg-white p-10 rounded-lg shadow border">
-                    <p className="text-gray-500 text-lg mb-4">Belum ada riwayat belanja.</p>
+                    <p className="text-gray-500 text-lg mb-4">Belum ada riwayat belanja di memori browser ini.</p>
                     <a href="/" className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition">
                         Yuk Belanja Dulu
                     </a>
@@ -88,7 +78,7 @@ function OrderHistoryPage() {
                                 <div className="space-y-2 mb-4">
                                     {order.items?.map((item, index) => (
                                         <div key={index} className="flex justify-between text-sm text-gray-600 border-b border-dashed pb-2 last:border-0">
-                                            <span>{item.name} <span className="text-gray-400 text-xs">x1</span></span>
+                                            <span>{item.name} <span className="text-gray-400 text-xs">x{item.quantity || 1}</span></span>
                                             <span>Rp {item.price.toLocaleString("id-ID")}</span>
                                         </div>
                                     ))}
@@ -98,7 +88,7 @@ function OrderHistoryPage() {
                                     <div className="text-sm text-gray-600">
                                         <p>Dikirim ke:</p>
                                         <p className="font-medium text-gray-900">
-                                            {order.shippingDetails?.address || order.customerInfo?.address || "-"}
+                                            {order.shippingDetails?.address || order.customerInfo?.address || "Alamat Lokal"}
                                         </p>
                                     </div>
                                     <div className="text-right">

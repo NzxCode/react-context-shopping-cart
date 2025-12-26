@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
+// Kita hapus useAuth kalau tidak ada firebase auth, atau biarkan kalau kamu pakai fake auth context
+// import { useAuth } from "../context/AuthContext"; 
 import { Link } from "react-router-dom"; 
-import { db } from "../firebase"; 
-import { collection, getDocs } from "firebase/firestore";
 
-export default function HomePage() {
-    const { currentUser } = useAuth();
+function HomePage() {
+    // Karena offline, kita hardcode user atau ambil dari localStorage jika ada fitur login sederhana
+    const currentUser = { email: "Guest@toko.com" }; 
+    
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [keyword, setKeyword] = useState("");
@@ -13,14 +14,15 @@ export default function HomePage() {
     const [sortBy, setSortBy] = useState("Terbaru");
 
     useEffect(() => {
-        async function fetchProducts() {
+        const fetchProducts = () => {
             try {
-                const querySnapshot = await getDocs(collection(db, "products"));
-                const data = querySnapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-                setProducts(data);
+                // AMBIL DARI LOCAL STORAGE
+                const storedProducts = localStorage.getItem("products");
+                if (storedProducts) {
+                    setProducts(JSON.parse(storedProducts));
+                } else {
+                    setProducts([]);
+                }
             } catch (error) {
                 console.error("Gagal mengambil data:", error);
             } finally {
@@ -56,8 +58,10 @@ export default function HomePage() {
                 <h1 className="text-3xl md:text-4xl font-bold mb-2">
                     Selamat Datang, {currentUser ? currentUser.email.split('@')[0] : "Pelanggan"}!
                 </h1>
-                <p className="text-purple-100">Temukan barang elektronik dengan harga terbaik disini.</p>
+                <p className="text-purple-100">Temukan barang elektronik (Mode Offline) disini.</p>
             </div>
+            
+            {/* ... Bagian Search & Filter SAMA PERSIS ... */}
             <div className="bg-white p-4 rounded-lg shadow-sm border mb-8 sticky top-20 z-10">
                 <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
                     <div className="w-full md:w-1/3 relative">
@@ -68,7 +72,6 @@ export default function HomePage() {
                             value={keyword}
                             onChange={(e) => setKeyword(e.target.value)}
                         />
-                        <span className="absolute left-3 top-2.5 text-gray-400"></span>
                     </div>
                     <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto">
                         {["Semua", "Laptop", "Smartphone", "Mic", "Headphone", "Elektronik"].map((cat) => (
@@ -78,13 +81,12 @@ export default function HomePage() {
                                 className={`px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition ${
                                     category === cat ? "bg-purple-600 text-white shadow-md" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                                 }`}
-                                >
-                                    {cat}
-                                </button>
+                            >
+                                {cat}
+                            </button>
                         ))}
-
                     </div>
-                        <div className="w-full md:w-auto">
+                    <div className="w-full md:w-auto">
                         <select 
                             value={sortBy}
                             onChange={(e) => setSortBy(e.target.value)}
@@ -96,9 +98,9 @@ export default function HomePage() {
                             <option value="za">Nama Z-A</option>
                         </select>
                     </div>
-
                 </div>
             </div>
+
             <h2 className="text-xl font-bold text-gray-800 mb-6">Daftar Produk ({filteredProducts.length})</h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -110,12 +112,12 @@ export default function HomePage() {
                                 alt={product.name}
                                 className="w-full h-full object-cover"
                             />
-                        {product.category && (
+                            {product.category && (
                                 <span className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
                                     {product.category}
                                 </span>
-                        )}
-                    </div>
+                            )}
+                        </div>
                         <div className="p-4 flex flex-col flex-grow">
                             <h3 className="font-bold text-lg text-gray-800 mb-1 truncate">{product.name}</h3>
                             <p className="text-gray-500 text-sm mb-4 line-clamp-2">{product.description || "Tidak ada deskripsi"}</p>
@@ -132,16 +134,16 @@ export default function HomePage() {
                     </div>
                 ))}
             </div>
+            
             {filteredProducts.length === 0 && (
                 <div className="text-center py-20">
-                    <p className="text-6xl mb-4">Tidak Ditemukan</p>
+                    <p className="text-6xl mb-4">🔍</p>
                     <h3 className="text-xl font-bold text-gray-700">Barang tidak ditemukan</h3>
-                    <p className="text-gray-500">Tidak ada produk {keyword} di kategori "{category}"</p>
-                    <button onClick={() => {setKeyword(""); setCategory("Semua")}} className="text-purple-600 underline mt-2">
-                        Reset Pencarian
-                    </button>
+                    <p className="text-gray-500">Cek di Admin Dashboard, apakah sudah tambah produk?</p>
                 </div>
             )}
         </div>
     );  
 }
+
+export default HomePage;

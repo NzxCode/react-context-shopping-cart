@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams,useNavigate } from "react-router-dom";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { db } from "../firebase.js";
+import { useParams, useNavigate } from "react-router-dom";
 
 function EditProductPage() {
     const { id } = useParams();
@@ -13,19 +11,20 @@ function EditProductPage() {
         image: "",
         description: ""
     });
-    useEffect(() => {
-        async function fetchProduct() {
-            try {
-                const docRef = doc(db, "products", id);
-                const docSnap = await getDoc(docRef);
 
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
+    // Ambil Data Lama
+    useEffect(() => {
+        const fetchProduct = () => {
+            try {
+                const storedProducts = JSON.parse(localStorage.getItem("products")) || [];
+                const foundProduct = storedProducts.find(p => p.id === id);
+
+                if (foundProduct) {
                     setForm({
-                        name: data.name,
-                        price: data.price, 
-                        image: data.image,
-                        description: data.description || ""
+                        name: foundProduct.name,
+                        price: foundProduct.price, 
+                        image: foundProduct.image,
+                        description: foundProduct.description || ""
                     });
                 } else {
                     alert("Produk tidak ditemukan!");
@@ -38,18 +37,33 @@ function EditProductPage() {
             }
         }
         fetchProduct();
-    }, [id]); 
-    const handleUpdate = async (e) => {
+    }, [id, navigate]); 
+
+    const handleUpdate = (e) => {
         e.preventDefault();
         
         try {
-            const docRef = doc(db, "products", id);
-            await updateDoc(docRef, {
-                ...form,
-                price: Number(form.price)
+            // Ambil semua produk
+            const storedProducts = JSON.parse(localStorage.getItem("products")) || [];
+            
+            // Buat array baru dengan data yang sudah diupdate
+            const updatedProducts = storedProducts.map(product => {
+                if (product.id === id) {
+                    return {
+                        ...product,
+                        name: form.name,
+                        price: Number(form.price),
+                        image: form.image, // URL gambar (Base64) tetap sama kalau tidak diedit
+                        description: form.description
+                    };
+                }
+                return product;
             });
 
-            alert("Produk berhasil diperbarui! ✨");
+            // Simpan Balik
+            localStorage.setItem("products", JSON.stringify(updatedProducts));
+
+            alert("Produk berhasil diperbarui di LocalStorage! ✨");
             navigate("/admin"); 
         } catch (error) {
             console.error("Gagal update:", error);
@@ -61,7 +75,7 @@ function EditProductPage() {
 
     return (
         <div className="container mx-auto p-8 max-w-lg">
-            <h1 className="text-2xl font-bold mb-6">Edit Produk</h1>
+            <h1 className="text-2xl font-bold mb-6">Edit Produk (Offline)</h1>
             
             <form onSubmit={handleUpdate} className="bg-white p-6 rounded shadow space-y-4">
                 <div>
@@ -86,14 +100,15 @@ function EditProductPage() {
                     />
                 </div>
 
+                {/* Input Gambar kita hide/disable dulu karena agak rumit edit gambar base64 tanpa upload ulang */}
                 <div>
-                    <label className="block text-sm font-bold mb-1">URL Gambar</label>
+                    <label className="block text-sm font-bold mb-1">Preview Gambar (Tidak bisa diubah disini)</label>
+                    <img src={form.image} alt="preview" className="w-20 h-20 object-cover mb-2 border"/>
                     <input 
                         type="text" 
-                        className="w-full border p-2 rounded bg-gray-50" 
-                        value={form.image}
-                        onChange={(e) => setForm({...form, image: e.target.value})}
-                        required
+                        className="w-full border p-2 rounded bg-gray-200 text-gray-500" 
+                        value="Untuk ganti gambar, silakan hapus & buat baru"
+                        disabled
                     />
                 </div>
 
