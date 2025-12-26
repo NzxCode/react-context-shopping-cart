@@ -1,148 +1,121 @@
 import { useContext, useState } from "react";
-import { CartContext } from "../context/CartContext";
+import { CartContext } from "../context/CartContext"; 
+import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { db } from "../firebase.js"; 
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
-export default function CheckoutPage() {
-    const { cart, cleanCart } = useContext(CartContext);
+function CheckoutPage() {
+    const { cart, totalPrice, clearCart } = useContext(CartContext);
+    const { currentUser } = useAuth();
     const navigate = useNavigate();
-    const [isLoading, setIsLoading] = useState(false);
 
-    const totalPrice = cart.reduce((total, item) => total + item.price, 0);
-
-    const [formData, setformData] = useState({
+    const [shipping, setShipping] = useState({
         name: "",
-        whatsapp: "",
-        address: "",
+        phone: "",
+        address: ""
     });
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setformData({
-            ...formData,
-            [name]: value
-        });
-    };
-
-    const handleSubmit = async (e) => {
+    const handleCheckout = (e) => {
         e.preventDefault();
 
-        if (!formData.name || !formData.whatsapp || !formData.address) {
-            alert("DATA BELUM LENGKAP! Mohon lengkapi semua kolom.");
+        if (cart.length === 0) {
+            alert("Keranjang kosong!");
             return;
         }
 
-        setIsLoading(true);
+        const newOrder = {
+            id: "ORD-" + Date.now(),
+            userId: currentUser ? currentUser.id : "guest",
+            items: cart,
+            totalAmount: totalPrice,
+            status: "Diproses",
+            createdAt: new Date().toISOString(),
+            shippingDetails: shipping
+        };
 
         try {
-            const orderData = {
-                buyer: {
-                    name: formData.name,
-                    whatsapp: formData.whatsapp,
-                    address: formData.address,
-                },
-                items: cart,
-                totalPrice: totalPrice,
-                status: "Pending",
-                createdAt: serverTimestamp()
-            };
+            const existingOrders = JSON.parse(localStorage.getItem("orders")) || [];
+            const updatedOrders = [...existingOrders, newOrder];
+            localStorage.setItem("orders", JSON.stringify(updatedOrders));
 
-            await addDoc(collection(db, "orders"), orderData);
-
-            alert(`Terima kasih ${formData.name}! Pesanan berhasil dibuat.`);
-            cleanCart();
-            navigate("/success");
+            clearCart();
+            
+            alert("Pembayaran Berhasil! Pesanan sedang diproses.");
+            navigate("/order-history");
 
         } catch (error) {
-            console.error("Error adding document: ", error);
-            alert("Gagal membuat pesanan. Periksa koneksi internet Anda.");
-        } finally {
-            setIsLoading(false);
+            console.error(error);
+            alert("Gagal memproses pesanan.");
         }
     };
 
     return (
-        <div className="p-8 container mx-auto">
-            <h1 className="text-3xl font-bold mb-8 text-center">Formulir Pembayaran</h1>
+        <div className="container mx-auto p-8 max-w-4xl">
+            <h1 className="text-3xl font-bold mb-6 text-center">Checkout / Pembayaran</h1>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                
-                <div className="bg-white p-6 shadow rounded-lg border">
-                    <h2 className="text-xl font-bold mb-4">Data Pembeli</h2>
-                    <form className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Kolom Kiri: Form Alamat */}
+                <div className="bg-white p-6 rounded shadow border">
+                    <h2 className="text-xl font-bold mb-4 border-b pb-2">Alamat Pengiriman</h2>
+                    <form id="checkoutForm" onSubmit={handleCheckout} className="space-y-4">
                         <div>
-                            <label className="block text-gray-700 font-medium mb-1">Nama Lengkap</label>
+                            <label className="block text-sm font-bold mb-1">Nama Penerima</label>
                             <input 
-                                type="text" 
-                                name="name"
-                                value={formData.name} 
-                                onChange={handleChange}
-                                disabled={isLoading}
-                                className="w-full border p-2 rounded" 
-                                placeholder="Contoh: Nicolas"
+                                type="text" required 
+                                className="w-full border p-2 rounded"
+                                value={shipping.name}
+                                onChange={(e) => setShipping({...shipping, name: e.target.value})}
                             />
                         </div>
-                        
                         <div>
-                            <label className="block text-gray-700 font-medium mb-1">Nomor WhatsApp</label>
+                            <label className="block text-sm font-bold mb-1">No. WhatsApp</label>
                             <input 
-                                type="number" 
-                                name="whatsapp"
-                                value={formData.whatsapp} 
-                                onChange={handleChange} 
-                                disabled={isLoading}
-                                className="w-full border p-2 rounded" 
-                                placeholder="08xxxxxxxx" 
+                                type="tel" required 
+                                className="w-full border p-2 rounded"
+                                value={shipping.phone}
+                                onChange={(e) => setShipping({...shipping, phone: e.target.value})}
                             />
                         </div>
-
                         <div>
-                            <label className="block text-gray-700 font-medium mb-1">Alamat Pengiriman</label>
+                            <label className="block text-sm font-bold mb-1">Alamat Lengkap</label>
                             <textarea 
-                                name="address" 
-                                rows="3" 
-                                value={formData.address} 
-                                onChange={handleChange}
-                                disabled={isLoading}
-                                className="w-full border p-2 rounded" 
-                                placeholder="Jalan, RT/RW..."
-                            >
-                            </textarea>
+                                required 
+                                className="w-full border p-2 rounded h-24"
+                                value={shipping.address}
+                                onChange={(e) => setShipping({...shipping, address: e.target.value})}
+                            ></textarea>
                         </div>
                     </form>
                 </div>
 
-                <div className="bg-gray-50 p-6 shadow rounded-lg border h-fit">
-                    <h2 className="text-xl font-bold mb-4">Ringkasan Belanja</h2>
-                    
-                    <div className="space-y-2 mb-4 text-sm text-gray-600">
+                {/* Kolom Kanan: Ringkasan Pesanan */}
+                <div className="bg-gray-50 p-6 rounded shadow border h-fit">
+                    <h2 className="text-xl font-bold mb-4 border-b pb-2">Ringkasan Pesanan</h2>
+                    <div className="space-y-2 mb-4 max-h-60 overflow-y-auto">
                         {cart.map((item, index) => (
-                            <div key={index} className="flex justify-between">
-                                <span>{item.name}</span>
+                            <div key={index} className="flex justify-between text-sm">
+                                <span>{item.name} <span className="text-gray-500">x1</span></span>
                                 <span>Rp {item.price.toLocaleString("id-ID")}</span>
                             </div>
                         ))}
                     </div>
-
-                    <div className="border-t pt-4 flex justify-between font-bold text-lg">
-                        <span>Total Bayar:</span>
-                        <span className="text-blue-600">Rp {totalPrice.toLocaleString("id-ID")}</span>
+                    
+                    <div className="border-t pt-4 mt-4">
+                        <div className="flex justify-between font-bold text-lg mb-6">
+                            <span>Total Bayar</span>
+                            <span className="text-purple-600">Rp {totalPrice.toLocaleString("id-ID")}</span>
+                        </div>
+                        
+                        <button 
+                            form="checkoutForm"
+                            className="w-full bg-green-600 text-white py-3 rounded font-bold hover:bg-green-700 transition shadow-lg"
+                        >
+                            BAYAR SEKARANG
+                        </button>
                     </div>
-
-                    <button
-                        onClick={handleSubmit} 
-                        disabled={isLoading || cart.length === 0}
-                        className={`w-full mt-6 py-3 rounded font-bold text-white transition ${
-                            isLoading 
-                            ? "bg-gray-400 cursor-not-allowed" 
-                            : "bg-green-600 hover:bg-green-700"
-                        }`}
-                    >
-                        {isLoading ? "MEMPROSES..." : "BAYAR SEKARANG"}
-                    </button>
                 </div>
             </div>
         </div>
     );
 }
+
+export default CheckoutPage;
