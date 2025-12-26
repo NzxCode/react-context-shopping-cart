@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom"; 
 import { db } from "../firebase"; 
 import { collection, getDocs } from "firebase/firestore";
@@ -16,7 +16,7 @@ export default function HomePage() {
         async function fetchProducts() {
             try {
                 const querySnapshot = await getDocs(collection(db, "products"));
-                const data = querySnapshot.doc.map(doc => ({
+                const data = querySnapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
                 }));
