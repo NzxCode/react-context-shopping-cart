@@ -30,7 +30,23 @@ export default function HomePage() {
         fetchProducts();
     }, []);
 
-    const filteredProducts = products;
+    const filteredProducts = products
+        .filter((product) => {
+            if (category === "Semua") return true;
+            return product.category === category;
+        })
+
+        .filter((product) => {
+            return product.name.toLowerCase().includes(keyword.toLowerCase());
+        })
+        
+        .sort((a, b) => {
+            if (sortBy === "termurah") return a.price - b.price;
+            if (sortBy === "termahal") return b.price - a.price;
+            if (sortBy === "az") return a.name.localeCompare(b.name);
+            if (sortBy === "za") return b.name.localeCompare(a.name);
+            return 0;
+        });
 
     if (loading) return <div className="p-10 text-center">Sedang memuat rak toko...</div>;
 
@@ -120,7 +136,10 @@ export default function HomePage() {
                 <div className="text-center py-20">
                     <p className="text-6xl mb-4">🙈</p>
                     <h3 className="text-xl font-bold text-gray-700">Barang tidak ditemukan</h3>
-                    <p className="text-gray-500">Coba cari kata kunci lain ya.</p>
+                    <p className="text-gray-500">Tidak ada produk "{keyword}" di kategori "{category}"</p>
+                    <button onClick={() => {setKeyword(""); setCategory("Semua")}} className="text-purple-600 underline mt-2">
+                        Reset Pencarian
+                    </button>
                 </div>
             )}
         </div>
