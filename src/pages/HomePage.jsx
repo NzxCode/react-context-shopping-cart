@@ -5,7 +5,8 @@ import { Link } from "react-router-dom";
 
 function HomePage() {
     // Karena offline, kita hardcode user atau ambil dari localStorage jika ada fitur login sederhana
-    const currentUser = { email: "Guest@toko.com" }; 
+    const activeUser = JSON.parse(localStorage.getItem("activeUser"));
+    const currentUser = activeUser ? activeUser : { email: "Guest@toko.com" };
     
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);

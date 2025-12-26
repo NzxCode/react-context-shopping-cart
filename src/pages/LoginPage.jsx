@@ -1,61 +1,81 @@
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { useNavigate, Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-export default function LoginPage() {
+function LoginPage() {
+    const navigate = useNavigate();
+    // const { login } = useAuth(); // Opsional kalau pakai context
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
-    const { login } = useAuth();
-    const navigate = useNavigate();
 
-    async function handleSubmit(e) {
+    const handleLogin = (e) => {
         e.preventDefault();
+        setError("");
+
         try {
-            setError("");
-            setLoading(true);
-            await login(email, password);
-            navigate("/");
-        } catch (error) {
-            setError("Gagal login. Cek kembali email dan password Anda.");
+            // 1. Ambil database user dari LocalStorage
+            const existingUsers = JSON.parse(localStorage.getItem("users")) || [];
+
+            // 2. Cari user yang cocok
+            const foundUser = existingUsers.find(
+                user => user.email === email && user.password === password
+            );
+
+            if (foundUser) {
+                // LOGIN BERHASIL!
+                // Simpan sesi login sederhana
+                localStorage.setItem("activeUser", JSON.stringify(foundUser));
+                
+                alert("Login Berhasil! Selamat datang " + foundUser.email);
+                navigate("/"); // Pindah ke Home
+            } else {
+                setError("Email atau Password salah!");
+            }
+
+        } catch (err) {
+            setError("Terjadi kesalahan sistem.");
+            console.error(err);
         }
-        setLoading(false);
-    }
+    };
+
     return (
-        <div className="flex justify-center items-center h-screen bg-gray-100">
-            <div className="bg-white p-8 rounded shadow-md w-96">
-                <h2 className="text-2xl font-bold mb-4 text-center">Masuk ke akun anda!</h2>
-                {error && <div className="bg-red-100 text-red-700 p-2 mb-4 text-sm rounded">{error}</div>}
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                    <input 
-                        type="email"
-                        placeholder="Email"
-                        className="border p-2 rounded"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
-                    <input 
-                        type="password"
-                        placeholder="Isi Password"
-                        className="border p-2 rounded"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="bg-green-600 text-white p-2 rounded hover:bg-green-700 disabled:opacity-50"
-                    >
-                        {loading ? "Sedang masuk..." : "Masuk Sekarang"}
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+            <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
+                <h2 className="text-2xl font-bold mb-6 text-center text-blue-600">Login Toko (Offline)</h2>
+                
+                {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm">{error}</div>}
+                
+                <form onSubmit={handleLogin} className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Email</label>
+                        <input 
+                            type="email" 
+                            className="w-full border p-2 rounded mt-1"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Password</label>
+                        <input 
+                            type="password" 
+                            className="w-full border p-2 rounded mt-1"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <button className="w-full bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700">
+                        Masuk
                     </button>
                 </form>
-                <div className="mt-4 text-center text-sm">
-                    Belum punya akun? <Link to="/register" className="text-blue-600 hover:underline">Register di sini</Link> 
-                </div>
+                <p className="text-center mt-4 text-sm">
+                    Belum punya akun? <Link to="/register" className="text-blue-600 font-bold">Daftar disini</Link>
+                </p>
             </div>
         </div>
-    )
+    );
 }
+
+export default LoginPage;
