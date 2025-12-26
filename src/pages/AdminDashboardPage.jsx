@@ -37,6 +37,8 @@ function AdminDashboardPage() {
 
     if (loading) return <div className="p-10 text-center">Sedang mengecek gudang...</div>;
 
+    console.log("Daftar Produk:", products);
+
     return (
         <div className="container mx-auto p-8">
             <div className="flex justify-between items-center mb-6">
