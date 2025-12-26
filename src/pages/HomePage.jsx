@@ -134,9 +134,9 @@ export default function HomePage() {
             </div>
             {filteredProducts.length === 0 && (
                 <div className="text-center py-20">
-                    <p className="text-6xl mb-4">🙈</p>
+                    <p className="text-6xl mb-4">Tidak Ditemukan</p>
                     <h3 className="text-xl font-bold text-gray-700">Barang tidak ditemukan</h3>
-                    <p className="text-gray-500">Tidak ada produk "{keyword}" di kategori "{category}"</p>
+                    <p className="text-gray-500">Tidak ada produk {keyword} di kategori "{category}"</p>
                     <button onClick={() => {setKeyword(""); setCategory("Semua")}} className="text-purple-600 underline mt-2">
                         Reset Pencarian
                     </button>
