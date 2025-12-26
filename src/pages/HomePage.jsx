@@ -56,7 +56,7 @@ export default function HomePage() {
                 <h1 className="text-3xl md:text-4xl font-bold mb-2">
                     Selamat Datang, {currentUser ? currentUser.email.split('@')[0] : "Pelanggan"}!
                 </h1>
-                <p className="text-purple-100">Temukan kebutuhan harianmu dengan harga terbaik disini.</p>
+                <p className="text-purple-100">Temukan barang elektronik dengan harga terbaik disini.</p>
             </div>
             <div className="bg-white p-4 rounded-lg shadow-sm border mb-8 sticky top-20 z-10">
                 <div className="flex flex-col md:flex-row gap-4 justify-between items-center">

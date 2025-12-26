@@ -9,6 +9,7 @@ function AddProductPage() {
     const [name, setName] = useState("");
     const [price, setPrice] = useState("");
     const [description, setDescription] = useState("");
+    const [category, setCategory] = useState("Laptop");
     const [imageFile, setImageFile] = useState(null);
     const [preview, setPreview] = useState(null); 
     const [loading, setLoading] = useState(false);
@@ -39,10 +40,12 @@ function AddProductPage() {
                 name: name,
                 price: Number(price),
                 image: downloadURL,
-                description: description
+                description: description,
+                category: category
             });
-            alert("Produk berhasil ditambahkan!");
+            alert("Mantap! Produk berhasil ditambahkan dengan kategory :" + category);
             navigate("/admin");
+
         } catch (error) {
             console.error("Gagal Upload:", error);
             alert("Waduh error saat upload: " + error.message);
@@ -50,6 +53,7 @@ function AddProductPage() {
             setLoading(false);
         }
     };
+
     return (
         <div className="container mx-auto p-8 max-w-lg">
             <h1 className="text-2xl font-bold mb-6">Tambah Produk Baru</h1>
@@ -63,17 +67,11 @@ function AddProductPage() {
                         onChange={handleImageChange}
                         className="w-full border p-2 rounded bg-gray-50"
                     />
+                    {preview && (
+                        <img src={preview} alt="Preview" className="mt-2 w-full h-48 object-cover rounded"/>
+                    )}
                 </div>
-                {preview && (
-                <div className="mt-4 text-center">
-                    <p className="text-xs text-gray-500 mb-2">Preview Tampilan:</p>
-                        <img 
-                            src={preview} 
-                            alt="Preview" 
-                            className="w-full h-64 object-cover rounded border-2 border-dashed border-gray-300"
-                        />
-                </div>
-                )}
+                
                 <div>
                     <label className="block text-sm font-bold mb-1">Nama Produk</label>
                     <input 
@@ -83,6 +81,21 @@ function AddProductPage() {
                         onChange={(e) => setName(e.target.value)}
                         required
                     />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-bold mb-1">Kategori</label>
+                    <select 
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                        className="w-full border p-2 rounded bg-white"
+                    >
+                        <option value="Mic">Mic</option>
+                        <option value="Headphone">Headphone</option>
+                        <option value="Laptop">Laptop</option>
+                        <option value="Smartphone">Smartphone</option>
+                        <option value="Elektronik">Elektronik</option>
+                    </select>
                 </div>
 
                 <div>
