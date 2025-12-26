@@ -16,7 +16,7 @@ export default function HomePage() {
         async function fetchProducts() {
             try {
                 const querySnapshot = await getDocs(collection(db, "products"));
-                const data = querySnapshot.docs.map(docs => ({
+                const data = querySnapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
                 }));
