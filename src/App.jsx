@@ -60,6 +60,11 @@ function App() {
             <EditProductPage />
           </AdminRoute>
         } />
+        <Route path="/history" element={
+          <ProtectedRoute>
+            <OrderHistoryPage />
+          </ProtectedRoute>} 
+        />
       </Routes>
     </div>
   );
