@@ -5,14 +5,12 @@ function AdminDashboardPage() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Ambil Data saat halaman dibuka
     useEffect(() => {
         fetchProducts();
     }, []);
 
     const fetchProducts = () => {
         try {
-            // AMBIL DARI LOCAL STORAGE
             const storedProducts = localStorage.getItem("products");
             if (storedProducts) {
                 setProducts(JSON.parse(storedProducts));
@@ -20,37 +18,32 @@ function AdminDashboardPage() {
                 setProducts([]);
             }
         } catch (error) {
-            console.error("Gagal mengambil data produk:", error);
+            console.error(error);
         } finally {
             setLoading(false);
         }
     };
 
     const handleDelete = (id) => {
-        if(!window.confirm("Yakin ingin menghapus produk ini dari memori?")) return;
+        if(!window.confirm("Yakin ingin menghapus produk ini?")) return;
         
         try {
-            // Filter produk yang ID-nya TIDAK sama dengan yang dihapus
             const updatedProducts = products.filter(product => product.id !== id);
-            
-            // Simpan array baru ke LocalStorage
             localStorage.setItem("products", JSON.stringify(updatedProducts));
-            
-            // Update tampilan
             setProducts(updatedProducts);
             alert("Produk berhasil dihapus!");
         } catch (error) {
-            console.error("Gagal menghapus produk:", error);
+            console.error(error);
             alert("Gagal menghapus produk.");
         }
     }
 
-    if (loading) return <div className="p-10 text-center">Sedang mengecek gudang lokal...</div>;
+    if (loading) return <div className="p-10 text-center">Sedang mengecek gudang...</div>;
 
     return (
         <div className="container mx-auto p-8">
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold text-gray-800">Gudang Produk (Offline Mode)</h1>
+                <h1 className="text-3xl font-bold text-gray-800">Gudang Produk</h1>
                 <Link to="/admin/add-product" className="bg-green-600 text-white px-4 py-2 rounded font-bold hover:bg-green-700 transition">
                     + Tambah Produk Baru
                 </Link>
@@ -70,7 +63,7 @@ function AdminDashboardPage() {
                         {products.length === 0 ? (
                             <tr>
                                 <td colSpan="4" className="p-10 text-center text-gray-500">
-                                    Gudang kosong melompong. Tambah barang dulu yuk!
+                                    Gudang kosong.
                                 </td>
                             </tr>
                         ) : (

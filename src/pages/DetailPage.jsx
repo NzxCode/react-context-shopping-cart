@@ -11,19 +11,14 @@ export default function DetailPage() {
     useEffect(() => {
         const ambilSatuProduk = () => {
             try {
-                // Ambil semua data
                 const storedProducts = JSON.parse(localStorage.getItem("products")) || [];
-                
-                // Cari produk yang ID-nya cocok
                 const foundProduct = storedProducts.find(p => p.id === id);
 
                 if (foundProduct) {
                     setProduct(foundProduct);
-                } else {
-                    console.log("Produk tidak ketemu di local storage");
                 }
             } catch (error) {
-                console.error("Gagal ambil detail:", error);
+                console.error(error);
             } finally {
                 setLoading(false); 
             }
@@ -33,7 +28,7 @@ export default function DetailPage() {
     }, [id]);
 
     if (loading) {
-        return <div className="text-center mt-20 text-xl font-bold">Sedang memuat data... ⏳</div>;
+        return <div className="text-center mt-20 text-xl font-bold">Sedang memuat data...</div>;
     }
 
     if (!product) {

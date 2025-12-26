@@ -11,7 +11,6 @@ function AddProductPage() {
     const [preview, setPreview] = useState(null); 
     const [loading, setLoading] = useState(false);
 
-    // Fungsi Pembantu: Ubah File Gambar jadi Teks Panjang (Base64)
     const convertToBase64 = (file) => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -36,21 +35,17 @@ function AddProductPage() {
         try {
             let imageUrl = "";
 
-            // 1. Proses Gambar (Tanpa Firebase Storage)
             if (imageFile) {
-                // Batasi ukuran gambar biar localStorage gak penuh (Max 2MB disarankan)
                 if (imageFile.size > 2 * 1024 * 1024) {
                     throw new Error("Ukuran gambar terlalu besar! Maksimal 2MB.");
                 }
                 imageUrl = await convertToBase64(imageFile);
             } else {
-                // Gambar default kalau gak upload
                 imageUrl = "https://via.placeholder.com/150"; 
             }
 
-            // 2. Buat Object Produk Baru
             const newProduct = {
-                id: Date.now().toString(), // ID Unik pakai waktu sekarang
+                id: Date.now().toString(), 
                 name: name,
                 price: Number(price),
                 image: imageUrl,
@@ -59,18 +54,16 @@ function AddProductPage() {
                 createdAt: new Date().toISOString()
             };
 
-            // 3. Ambil data lama dari LocalStorage, lalu gabung
             const existingProducts = JSON.parse(localStorage.getItem("products")) || [];
             const updatedProducts = [...existingProducts, newProduct];
 
-            // 4. Simpan kembali ke LocalStorage
             localStorage.setItem("products", JSON.stringify(updatedProducts));
 
-            alert("Mantap! Produk berhasil ditambahkan ke LocalStorage: " + category);
+            alert("Produk berhasil ditambahkan!");
             navigate("/admin");
 
         } catch (error) {
-            console.error("Gagal Upload:", error);
+            console.error(error);
             alert("Gagal menyimpan: " + error.message);
         } finally {
             setLoading(false);
@@ -79,7 +72,7 @@ function AddProductPage() {
 
     return (
         <div className="container mx-auto p-8 max-w-lg">
-            <h1 className="text-2xl font-bold mb-6">Tambah Produk Baru (Offline)</h1>
+            <h1 className="text-2xl font-bold mb-6">Tambah Produk Baru</h1>
             
             <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow space-y-4">
                 <div>
@@ -144,7 +137,7 @@ function AddProductPage() {
                 <button 
                     disabled={loading}
                     className="w-full bg-purple-600 text-white py-3 rounded font-bold hover:bg-purple-700 transition">
-                    {loading ? "Sedang Menyimpan..." : "SIMPAN KE LOCAL STORAGE"}
+                    {loading ? "Sedang Menyimpan..." : "SIMPAN"}
                 </button>
             </form>
         </div>

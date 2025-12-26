@@ -12,7 +12,6 @@ function EditProductPage() {
         description: ""
     });
 
-    // Ambil Data Lama
     useEffect(() => {
         const fetchProduct = () => {
             try {
@@ -31,7 +30,7 @@ function EditProductPage() {
                     navigate("/admin");
                 }
             } catch (error) {
-                console.error("Gagal ambil data:", error);
+                console.error(error);
             } finally {
                 setLoading(false);
             }
@@ -43,30 +42,27 @@ function EditProductPage() {
         e.preventDefault();
         
         try {
-            // Ambil semua produk
             const storedProducts = JSON.parse(localStorage.getItem("products")) || [];
             
-            // Buat array baru dengan data yang sudah diupdate
             const updatedProducts = storedProducts.map(product => {
                 if (product.id === id) {
                     return {
                         ...product,
                         name: form.name,
                         price: Number(form.price),
-                        image: form.image, // URL gambar (Base64) tetap sama kalau tidak diedit
+                        image: form.image,
                         description: form.description
                     };
                 }
                 return product;
             });
 
-            // Simpan Balik
             localStorage.setItem("products", JSON.stringify(updatedProducts));
 
-            alert("Produk berhasil diperbarui di LocalStorage! ✨");
+            alert("Produk berhasil diperbarui!");
             navigate("/admin"); 
         } catch (error) {
-            console.error("Gagal update:", error);
+            console.error(error);
             alert("Gagal update produk.");
         }
     };
@@ -75,7 +71,7 @@ function EditProductPage() {
 
     return (
         <div className="container mx-auto p-8 max-w-lg">
-            <h1 className="text-2xl font-bold mb-6">Edit Produk (Offline)</h1>
+            <h1 className="text-2xl font-bold mb-6">Edit Produk</h1>
             
             <form onSubmit={handleUpdate} className="bg-white p-6 rounded shadow space-y-4">
                 <div>
@@ -100,14 +96,13 @@ function EditProductPage() {
                     />
                 </div>
 
-                {/* Input Gambar kita hide/disable dulu karena agak rumit edit gambar base64 tanpa upload ulang */}
                 <div>
-                    <label className="block text-sm font-bold mb-1">Preview Gambar (Tidak bisa diubah disini)</label>
+                    <label className="block text-sm font-bold mb-1">Preview Gambar</label>
                     <img src={form.image} alt="preview" className="w-20 h-20 object-cover mb-2 border"/>
                     <input 
                         type="text" 
                         className="w-full border p-2 rounded bg-gray-200 text-gray-500" 
-                        value="Untuk ganti gambar, silakan hapus & buat baru"
+                        value="Hapus dan buat baru untuk ganti gambar"
                         disabled
                     />
                 </div>

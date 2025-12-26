@@ -1,13 +1,9 @@
 import { useEffect, useState } from "react";
-// Kita hapus useAuth kalau tidak ada firebase auth, atau biarkan kalau kamu pakai fake auth context
-// import { useAuth } from "../context/AuthContext"; 
+import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom"; 
 
 function HomePage() {
-    // Karena offline, kita hardcode user atau ambil dari localStorage jika ada fitur login sederhana
-    const activeUser = JSON.parse(localStorage.getItem("activeUser"));
-    const currentUser = activeUser ? activeUser : { email: "Guest@toko.com" };
-    
+    const { currentUser } = useAuth();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [keyword, setKeyword] = useState("");
@@ -17,7 +13,6 @@ function HomePage() {
     useEffect(() => {
         const fetchProducts = () => {
             try {
-                // AMBIL DARI LOCAL STORAGE
                 const storedProducts = localStorage.getItem("products");
                 if (storedProducts) {
                     setProducts(JSON.parse(storedProducts));
@@ -25,7 +20,7 @@ function HomePage() {
                     setProducts([]);
                 }
             } catch (error) {
-                console.error("Gagal mengambil data:", error);
+                console.error(error);
             } finally {
                 setLoading(false);
             }
@@ -38,11 +33,9 @@ function HomePage() {
             if (category === "Semua") return true;
             return product.category === category;
         })
-
         .filter((product) => {
             return product.name.toLowerCase().includes(keyword.toLowerCase());
         })
-        
         .sort((a, b) => {
             if (sortBy === "termurah") return a.price - b.price;
             if (sortBy === "termahal") return b.price - a.price;
@@ -57,12 +50,11 @@ function HomePage() {
         <div className="container mx-auto p-4 md:p-8 min-h-screen">
             <div className="bg-purple-600 text-white p-8 rounded-2xl shadow-lg mb-8 text-center">
                 <h1 className="text-3xl md:text-4xl font-bold mb-2">
-                    Selamat Datang, {currentUser ? currentUser.email.split('@')[0] : "Pelanggan"}!
+                    Selamat Datang, {currentUser ? currentUser.email : "Pelanggan"}!
                 </h1>
-                <p className="text-purple-100">Temukan barang elektronik (Mode Offline) disini.</p>
+                <p className="text-purple-100">Temukan barang elektronik terbaik disini.</p>
             </div>
             
-            {/* ... Bagian Search & Filter SAMA PERSIS ... */}
             <div className="bg-white p-4 rounded-lg shadow-sm border mb-8 sticky top-20 z-10">
                 <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
                     <div className="w-full md:w-1/3 relative">
@@ -140,7 +132,6 @@ function HomePage() {
                 <div className="text-center py-20">
                     <p className="text-6xl mb-4">🔍</p>
                     <h3 className="text-xl font-bold text-gray-700">Barang tidak ditemukan</h3>
-                    <p className="text-gray-500">Cek di Admin Dashboard, apakah sudah tambah produk?</p>
                 </div>
             )}
         </div>
